@@ -21,21 +21,25 @@ namespace bc
                 var parser = new Parser(inputLine);
                 var expression = parser.Parse();
 
-                var color = Console.ForegroundColor;
+                var textColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 
                 PrettyPrint(expression);
-                Console.ForegroundColor = color;
+                Console.ForegroundColor = textColor;
             }
         }
 
-        static void PrettyPrint(SyntaxNode node, string indent = "")
+        static void PrettyPrint(SyntaxNode node, string indent = "", bool isLastChild = true)
         {
             // └──>
             // ├──>
             // │
 
+            
+            var marker = isLastChild ? "└──>" : "├──>";
+
             Console.Write(indent);
+            Console.Write(marker);
             Console.Write(node.Kind);
 
             if (node is SyntaxToken syntaxToken && syntaxToken.Value != null)
@@ -46,11 +50,15 @@ namespace bc
 
             Console.WriteLine();
 
-            indent += "    ";
+            //indent += "    ";
+
+            indent += isLastChild ? "    " : "│   ";
+            
+            var lastChild = node.GetChildren().LastOrDefault();
 
             foreach (var child in node.GetChildren())
             {
-                PrettyPrint(child, indent);
+                PrettyPrint(child, indent, child == lastChild);
             }
         }
     }
