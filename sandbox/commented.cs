@@ -1,24 +1,4 @@
-                var lexer = new Lexer(inputLine);
-                while (true)
-                {
-                    var token = lexer.NextToken();
-                    if (token.Kind == SyntaxKind.EndOfFileToken)
-                    {
-                        break;
-                    }
-                    Console.Write($"{token.Kind}: '{token.Text}'");
-
-                    if (token.Value != null)
-                    {
-                        Console.Write($" {token.Value}");
-                    }
-
-                    Console.WriteLine();
-                }
-
-
-/*new original*/
-
+/*delete this comment tag
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,9 +24,11 @@ namespace Blaster
                 {
                     return;
                 }
+                delete this comment tag*/
 
                 /**********************************$UDO COMMANDS LIST - START************************************/
                 
+                /*delete this comment tag
                 //Basic commands for terminal operation ($udo)
                 if (inputLine == "$udo")
                 {
@@ -97,9 +79,11 @@ namespace Blaster
                     Console.WriteLine(">>Blaster Terminal terminated with code 0<<");
                     Environment.Exit(0);
                 }
+                delete this comment tag*/
 
                 /**********************************$UDO COMMANDS LIST - END**************************************/
-
+                
+                /*delete this comment tag
                 //var parser = new Parser(inputLine);
                 var syntaxTree = SyntaxTree.Parse(inputLine);
 
@@ -586,3 +570,4 @@ namespace Blaster
     }
 
 }
+delete this comment tag*/
