@@ -27,10 +27,16 @@ namespace bc
                 PrettyPrint(syntaxTree.Root);
                 Console.ForegroundColor = textColor;
 
-                if (syntaxTree.Diagnostics.Any())
+                if (!syntaxTree.Diagnostics.Any())
+                {
+                    var evaluator = new Evaluator(syntaxTree.Root);
+                    var evaluationResult = evaluator.Evaluate();
+                    Console.WriteLine(evaluationResult);
+                }
+                else
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
-                    
+
                     foreach (var diagnostic in syntaxTree.Diagnostics)
                     {
                         Console.WriteLine(diagnostic);
@@ -163,7 +169,13 @@ namespace bc
 
                 var length = _position - start;
                 var text = _text.Substring(start, length);
-                int.TryParse(text, out var value);
+                if (!int.TryParse(text, out var value))
+                {
+                    _diagnostics.Add($"The number {_text} is NOT a valid Int32.");
+                    var textHint = "[Hint]: (Int32 is an immutable value type that represents signed 32-bit integers with values that range from negative 2,147,483,648 through positive 2,147,483,647.)";
+                    _diagnostics.Add(textHint);
+                }
+
                 return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
             }
 
@@ -367,4 +379,60 @@ namespace bc
             return new NumberExpressionSyntax(numberToken);
         }
     }
+
+    class Evaluator
+    {
+        private readonly ExpressionSyntax _root;
+
+        public Evaluator(ExpressionSyntax root)
+        {
+            this._root = root;
+            //
+        }
+
+        public int Evaluate()
+        {
+            return EvaluateExpression(_root);
+        }
+
+        private int EvaluateExpression(ExpressionSyntax node)
+        {
+            
+            //Evaluate NumberExpression
+            if (node is NumberExpressionSyntax numberExpressionSyntax)
+            {
+                return (int) numberExpressionSyntax.NumberToken.Value;
+            }
+            
+            //Evaluate BinaryExpression
+            if (node is BinaryExpressionSyntax binaryExpressionSyntax)
+            {
+                var leftSide = EvaluateExpression(binaryExpressionSyntax.LeftSide);
+                var rightSide = EvaluateExpression(binaryExpressionSyntax.RightSide);
+
+                if (binaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.PlusToken)
+                {
+                    return leftSide + rightSide;
+                }
+                else if (binaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.MinusToken)
+                {
+                    return leftSide - rightSide;
+                }
+                else if (binaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.MultiplyToken)
+                {
+                    return leftSide * rightSide;
+                }
+                else if (binaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.DivideToken)
+                {
+                    return leftSide / rightSide;
+                }
+                else
+                {
+                    throw new Exception($"Unexpected binary operator {binaryExpressionSyntax.OperatorToken.Kind}");
+                }
+            }
+            throw new Exception($"Unexpected node {node.Kind}");
+        }
+    }
+
 }
