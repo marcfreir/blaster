@@ -18,6 +18,24 @@ namespace bc
                     return;
                 }
 
+                /**********************************START************************************/
+                //Basic commands for terminal operation
+                //Just to exit the terminal
+                if (inputLine == "exit" || inputLine =="EXIT" || inputLine == "Exit")
+                {
+                    Environment.Exit(0);
+                }
+                if (inputLine == "help" || inputLine == "HELP")
+                {
+                    var _help_command = "[You typed >> help]";
+                    var _type_line = "Just type the command...\n";
+                    var _exit_message = "exit -> to exit the terminal. ";
+                    var _help_message = "help -> to help hints. ";
+                    Console.WriteLine($"{_help_command}\n\n{_type_line}\n{_exit_message}\n{_help_message}");
+                    continue;
+                }
+                /**********************************END**************************************/
+
                 var parser = new Parser(inputLine);
                 var syntaxTree = parser.Parse();
 
@@ -363,7 +381,10 @@ namespace bc
         {
             var leftSide = ParsePrimaryExpression();
 
-            while (CurrentToken.Kind == SyntaxKind.PlusToken || CurrentToken.Kind == SyntaxKind.MinusToken)
+            while (CurrentToken.Kind == SyntaxKind.PlusToken || 
+                    CurrentToken.Kind == SyntaxKind.MinusToken ||
+                    CurrentToken.Kind == SyntaxKind.MultiplyToken ||
+                    CurrentToken.Kind == SyntaxKind.DivideToken)
             {
                 var operatorToken = NextToken();
                 var rightSide = ParsePrimaryExpression();
