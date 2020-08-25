@@ -4,6 +4,11 @@
 <br />
 
 
+__Terminal preview:__
+
+<div align="center"><img src="./_img/terminalPreview.png" alt="Terminal Preview" /></div>
+<br />
+
 
     Status: On-going
     Version: 1.0
