@@ -4,9 +4,14 @@
 <br />
 
 
-__Terminal preview:__
+__Terminal preview 01:__
 
-<div align="center"><img src="./_img/terminalPreview.png" alt="Terminal Preview" /></div>
+<div align="center"><img src="./_img/terminalPreview1.png" alt="Terminal Preview" /></div>
+<br />
+
+__Terminal preview 02:__
+
+<div align="center"><img src="./_img/terminalPreview2.png" alt="Terminal Preview" /></div>
 <br />
 
 
