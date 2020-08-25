@@ -19,13 +19,24 @@ namespace bc
                 }
 
                 var parser = new Parser(inputLine);
-                var expression = parser.Parse();
+                var syntaxTree = parser.Parse();
 
                 var textColor = Console.ForegroundColor;
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 
-                PrettyPrint(expression);
+                PrettyPrint(syntaxTree.Root);
                 Console.ForegroundColor = textColor;
+
+                if (syntaxTree.Diagnostics.Any())
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    
+                    foreach (var diagnostic in syntaxTree.Diagnostics)
+                    {
+                        Console.WriteLine(diagnostic);
+                    }
+                    Console.ForegroundColor = textColor;
+                }
             }
         }
 
@@ -104,10 +115,13 @@ namespace bc
     {
         private readonly string _text;
         private int _position;
+        private List<string> _diagnostics = new List<string>();
         public Lexer(string text)
         {
             this._text = text;
         }
+
+        public IEnumerable<string> Diagnostics => _diagnostics;
 
         private char CurrentChar
         {
@@ -193,6 +207,8 @@ namespace bc
                 return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
             }
 
+            _diagnostics.Add($"ERROR:: Bad character input: '{CurrentChar}'");
+
             return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.Substring(_position - 1, 1), null);
         }
     }
@@ -248,9 +264,24 @@ namespace bc
         }
     }
 
+    sealed class SyntaxTree
+    {
+        public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
+        {
+            Diagnostics = diagnostics.ToArray();
+            Root = root;
+            EndOfFileToken = endOfFileToken;
+        }
+
+        public IReadOnlyList<string> Diagnostics { get; }
+        public ExpressionSyntax Root { get; }
+        public SyntaxToken EndOfFileToken { get; }
+    }
+
     class Parser
     {
         private readonly SyntaxToken[] _tokenList;
+        private List<string> _diagnostics = new List<string>();
         private int _position;
 
         public Parser(string text)
@@ -271,7 +302,10 @@ namespace bc
             } while (token.Kind != SyntaxKind.EndOfFileToken);
 
             _tokenList = tokenList.ToArray();
+            _diagnostics.AddRange(lexer.Diagnostics);
         }
+
+        public IEnumerable<string> Diagnostics => _diagnostics;
 
         private SyntaxToken Peek(int offset)
         {
@@ -300,11 +334,20 @@ namespace bc
             {
                 return NextToken();
             }
-
+            
+            _diagnostics.Add($"ERROR:: Unexpected token <{CurrentToken.Kind}>, expected <{kind}>");
             return new SyntaxToken(kind, CurrentToken.Position, null, null);
         }
 
-        public ExpressionSyntax Parse()
+        public SyntaxTree Parse()
+        {
+            var expression = ParseExpression();
+            var endOfFileToken = Match(SyntaxKind.EndOfFileToken);
+
+            return new SyntaxTree(_diagnostics, expression, endOfFileToken);
+        }
+
+        private ExpressionSyntax ParseExpression()
         {
             var leftSide = ParsePrimaryExpression();
 
