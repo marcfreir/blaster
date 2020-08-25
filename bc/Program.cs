@@ -8,8 +8,14 @@ namespace bc
     {
         static void Main(string[] args)
         {
+            //For the $udo commands
+            bool _showTree = false;
+            bool _hideTree = true;
+
+            
             while (true)
             {
+                //For the terminal inicialization
                 Console.Write("$blaster>> ");
                 var inputLine = Console.ReadLine();
 
@@ -18,32 +24,65 @@ namespace bc
                     return;
                 }
 
-                /**********************************START************************************/
-                //Basic commands for terminal operation
-                //Just to exit the terminal
-                if (inputLine == "exit" || inputLine =="EXIT" || inputLine == "Exit")
+                /**********************************$UDO COMMANDS LIST - START************************************/
+                
+                //Basic commands for terminal operation ($udo)
+                if (inputLine == "$udo")
                 {
-                    Environment.Exit(0);
+                    var _sudo_message = "$udo <command expected>!";
+                    Console.WriteLine(_sudo_message);
+                    continue;
                 }
-                if (inputLine == "help" || inputLine == "HELP")
+
+                //Showing the Tree
+                if (inputLine == "$udo showTree")
                 {
-                    var _help_command = "[You typed >> help]";
+                    _showTree = true;
+                    Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
+                    continue;
+                }
+                //Disable Showing the Tree
+                if (inputLine == "$udo hideTree")
+                {
+                    //if (_showTree)
+                    //{
+                        _showTree = _hideTree;
+                        Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
+                        continue;
+                    //}
+                }
+                
+                //Showing helper commands (Help Library)
+                if (inputLine == "$udo help" || inputLine == "$udo HELP")
+                {
+                    var _help_command = "[You typed >> $help]";
                     var _type_line = "Just type the command...\n";
-                    var _exit_message = "exit -> to exit the terminal. ";
-                    var _help_message = "help -> to help hints. ";
+                    var _exit_message = "$udo exit -> to exit the terminal. ";
+                    var _help_message = "$udo help -> to help hints. ";
                     Console.WriteLine($"{_help_command}\n\n{_type_line}\n{_exit_message}\n{_help_message}");
                     continue;
                 }
-                /**********************************END**************************************/
 
-                var parser = new Parser(inputLine);
-                var syntaxTree = parser.Parse();
+                //Just to exit the terminal
+                if (inputLine == "exit" || inputLine =="EXIT" || inputLine == "Exit" || inputLine == "$udo exit")
+                {
+                    Console.WriteLine(">>Blaster Terminal terminated with code 0<<");
+                    Environment.Exit(0);
+                }
 
-                var textColor = Console.ForegroundColor;
-                Console.ForegroundColor = ConsoleColor.DarkGray;
-                
-                PrettyPrint(syntaxTree.Root);
-                Console.ForegroundColor = textColor;
+                /**********************************$UDO COMMANDS LIST - END**************************************/
+
+                //var parser = new Parser(inputLine);
+                var syntaxTree = SyntaxTree.Parse(inputLine);
+
+                if (_showTree)
+                {
+                    var textColor = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    
+                    PrettyPrint(syntaxTree.Root);
+                    Console.ForegroundColor = textColor;
+                }
 
                 if (!syntaxTree.Diagnostics.Any())
                 {
@@ -53,6 +92,7 @@ namespace bc
                 }
                 else
                 {
+                    var textColor = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
 
                     foreach (var diagnostic in syntaxTree.Diagnostics)
@@ -111,7 +151,8 @@ namespace bc
         BadToken,
         EndOfFileToken,
         NumberExpression,
-        BinaryExpression
+        BinaryExpression,
+        ParenthesizedExpression
     }
 
     class SyntaxToken : SyntaxNode
@@ -294,6 +335,30 @@ namespace bc
         }
     }
 
+    sealed class ParenthesizedExpressionSyntax : ExpressionSyntax
+    {
+        public ParenthesizedExpressionSyntax(SyntaxToken openParenthesisToken, ExpressionSyntax expression, SyntaxToken closeParenthesisToken)
+        {
+            OpenParenthesisToken = openParenthesisToken;
+            Expression = expression;
+            CloseParenthesisToken = closeParenthesisToken;
+        }
+
+        public override SyntaxKind Kind => SyntaxKind.ParenthesizedExpression;
+
+        public SyntaxToken OpenParenthesisToken { get; }
+        public ExpressionSyntax Expression { get; }
+        public SyntaxToken CloseParenthesisToken { get; }
+
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            yield return OpenParenthesisToken;
+            yield return Expression;
+            yield return CloseParenthesisToken;
+        }
+    }
+
     sealed class SyntaxTree
     {
         public SyntaxTree(IEnumerable<string> diagnostics, ExpressionSyntax root, SyntaxToken endOfFileToken)
@@ -306,6 +371,12 @@ namespace bc
         public IReadOnlyList<string> Diagnostics { get; }
         public ExpressionSyntax Root { get; }
         public SyntaxToken EndOfFileToken { get; }
+
+        public static SyntaxTree Parse(string text)
+        {
+            var parser = new Parser(text);
+            return parser.Parse();
+        }
     }
 
     class Parser
@@ -369,22 +440,38 @@ namespace bc
             return new SyntaxToken(kind, CurrentToken.Position, null, null);
         }
 
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseTermExpression();
+        }
+
         public SyntaxTree Parse()
         {
-            var expression = ParseExpression();
+            var expression = ParseTermExpression();
             var endOfFileToken = Match(SyntaxKind.EndOfFileToken);
 
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
-        private ExpressionSyntax ParseExpression()
+        private ExpressionSyntax ParseTermExpression()
+        {
+            var leftSide = ParseFactorExpression();
+
+            while (CurrentToken.Kind == SyntaxKind.PlusToken || CurrentToken.Kind == SyntaxKind.MinusToken)
+            {
+                var operatorToken = NextToken();
+                var rightSide = ParseFactorExpression();
+                leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
+            }
+
+            return leftSide;
+        }
+
+        private ExpressionSyntax ParseFactorExpression()
         {
             var leftSide = ParsePrimaryExpression();
 
-            while (CurrentToken.Kind == SyntaxKind.PlusToken || 
-                    CurrentToken.Kind == SyntaxKind.MinusToken ||
-                    CurrentToken.Kind == SyntaxKind.MultiplyToken ||
-                    CurrentToken.Kind == SyntaxKind.DivideToken)
+            while (CurrentToken.Kind == SyntaxKind.MultiplyToken || CurrentToken.Kind == SyntaxKind.DivideToken)
             {
                 var operatorToken = NextToken();
                 var rightSide = ParsePrimaryExpression();
@@ -396,6 +483,14 @@ namespace bc
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
+            if (CurrentToken.Kind == SyntaxKind.OpenParenthesisToken)
+            {
+                var leftSide = NextToken();
+                var expression = ParseExpression();
+                var rightSide = Match(SyntaxKind.CloseParenthesisToken);
+
+                return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
+            }
             var numberToken = Match(SyntaxKind.NumberToken);
             return new NumberExpressionSyntax(numberToken);
         }
@@ -452,6 +547,12 @@ namespace bc
                     throw new Exception($"Unexpected binary operator {binaryExpressionSyntax.OperatorToken.Kind}");
                 }
             }
+
+            if (node is ParenthesizedExpressionSyntax parenthesizedExpressionSyntax)
+            {
+                return EvaluateExpression(parenthesizedExpressionSyntax.Expression);
+            }
+
             throw new Exception($"Unexpected node {node.Kind}");
         }
     }
