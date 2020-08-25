@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace bc
 {
@@ -16,23 +18,39 @@ namespace bc
                     return;
                 }
 
-                var lexer = new Lexer(inputLine);
-                while (true)
-                {
-                    var token = lexer.NextToken();
-                    if (token.Kind == SyntaxKind.EndOfFileToken)
-                    {
-                        break;
-                    }
-                    Console.Write($"{token.Kind}: '{token.Text}'");
+                var parser = new Parser(inputLine);
+                var expression = parser.Parse();
 
-                    if (token.Value != null)
-                    {
-                        Console.Write($" {token.Value}");
-                    }
+                var color = Console.ForegroundColor;
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                
+                PrettyPrint(expression);
+                Console.ForegroundColor = color;
+            }
+        }
 
-                    Console.WriteLine();
-                }
+        static void PrettyPrint(SyntaxNode node, string indent = "")
+        {
+            // └──>
+            // ├──>
+            // │
+
+            Console.Write(indent);
+            Console.Write(node.Kind);
+
+            if (node is SyntaxToken syntaxToken && syntaxToken.Value != null)
+            {
+                Console.Write(" ");
+                Console.Write(syntaxToken.Value);
+            }
+
+            Console.WriteLine();
+
+            indent += "    ";
+
+            foreach (var child in node.GetChildren())
+            {
+                PrettyPrint(child, indent);
             }
         }
     }
@@ -48,10 +66,12 @@ namespace bc
         OpenParenthesisToken,
         CloseParenthesisToken,
         BadToken,
-        EndOfFileToken
+        EndOfFileToken,
+        NumberExpression,
+        BinaryExpression
     }
 
-    class SyntaxToken
+    class SyntaxToken : SyntaxNode
     {
         public SyntaxToken(SyntaxKind kind, int position, string text, object value)
         {
@@ -61,10 +81,15 @@ namespace bc
             Value = value;
         }
 
-        public SyntaxKind Kind { get; }
+        public override SyntaxKind Kind { get; }
         public int Position { get; }
         public string Text { get; }
         public object Value { get; }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
     }
 
     class Lexer
@@ -161,6 +186,134 @@ namespace bc
             }
 
             return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.Substring(_position - 1, 1), null);
+        }
+    }
+
+    abstract class SyntaxNode
+    {
+        public abstract SyntaxKind Kind { get; }
+
+        public abstract IEnumerable<SyntaxNode> GetChildren();
+    }
+
+    abstract class ExpressionSyntax : SyntaxNode
+    {
+        
+    }
+
+    sealed class NumberExpressionSyntax : ExpressionSyntax
+    {
+        public NumberExpressionSyntax(SyntaxToken numberToken)
+        {
+            NumberToken = numberToken;
+        }
+
+        public override SyntaxKind Kind => SyntaxKind.NumberExpression;
+
+        public SyntaxToken NumberToken { get; }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            yield return NumberToken;
+        }
+    }
+
+    sealed class BinaryExpressionSyntax : ExpressionSyntax
+    {
+        public BinaryExpressionSyntax(ExpressionSyntax leftSide, SyntaxToken operatorToken, ExpressionSyntax rightSide)
+        {
+            LeftSide = leftSide;
+            OperatorToken = operatorToken;
+            RightSide = rightSide;
+        }
+
+        public override SyntaxKind Kind => SyntaxKind.BinaryExpression;
+        public ExpressionSyntax LeftSide { get; }
+        public SyntaxToken OperatorToken { get; }
+        public ExpressionSyntax RightSide { get; }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            yield return LeftSide;
+            yield return OperatorToken;
+            yield return RightSide;
+        }
+    }
+
+    class Parser
+    {
+        private readonly SyntaxToken[] _tokenList;
+        private int _position;
+
+        public Parser(string text)
+        {
+            var tokenList = new List<SyntaxToken>();
+            var lexer = new Lexer(text);
+            SyntaxToken token;
+
+            do
+            {
+                token = lexer.NextToken();
+
+                if (token.Kind != SyntaxKind.WhitespaceToken && token.Kind != SyntaxKind.BadToken)
+                {
+                    tokenList.Add(token);
+                }
+
+            } while (token.Kind != SyntaxKind.EndOfFileToken);
+
+            _tokenList = tokenList.ToArray();
+        }
+
+        private SyntaxToken Peek(int offset)
+        {
+            var index = _position + offset;
+
+            if (index >= _tokenList.Length)
+            {
+                return _tokenList[_tokenList.Length - 1];
+            }
+
+            return _tokenList[index];
+        }
+
+        private SyntaxToken CurrentToken => Peek(0);
+
+        private SyntaxToken NextToken()
+        {
+            var currentToken = CurrentToken;
+            _position++;
+            return currentToken;
+        }
+
+        private SyntaxToken Match(SyntaxKind kind)
+        {
+            if (CurrentToken.Kind == kind)
+            {
+                return NextToken();
+            }
+
+            return new SyntaxToken(kind, CurrentToken.Position, null, null);
+        }
+
+        public ExpressionSyntax Parse()
+        {
+            var leftSide = ParsePrimaryExpression();
+
+            while (CurrentToken.Kind == SyntaxKind.PlusToken || CurrentToken.Kind == SyntaxKind.MinusToken)
+            {
+                var operatorToken = NextToken();
+                var rightSide = ParsePrimaryExpression();
+                leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
+            }
+
+            return leftSide;
+        }
+
+        private ExpressionSyntax ParsePrimaryExpression()
+        {
+            var numberToken = Match(SyntaxKind.NumberToken);
+            return new NumberExpressionSyntax(numberToken);
         }
     }
 }
