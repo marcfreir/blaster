@@ -1,4 +1,4 @@
-namespace Blaster.CodeReview
+namespace Blaster.CodeReview.Syntax
 {
     internal static class SyntaxFacts
     {

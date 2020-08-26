@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Blaster.CodeReview
+namespace Blaster.CodeReview.Syntax
 {
     public sealed class SyntaxToken : SyntaxNode
     {

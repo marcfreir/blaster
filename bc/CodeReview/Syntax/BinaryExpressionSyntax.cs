@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Blaster.CodeReview
+namespace Blaster.CodeReview.Syntax
 {
     public sealed class BinaryExpressionSyntax : ExpressionSyntax
     {

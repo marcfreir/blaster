@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Blaster.CodeReview
+namespace Blaster.CodeReview.Syntax
 {
     internal sealed class Parser
     {

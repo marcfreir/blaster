@@ -1,4 +1,4 @@
-namespace Blaster.CodeReview
+namespace Blaster.CodeReview.Syntax
 {
     public enum SyntaxKind
     {

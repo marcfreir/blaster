@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Blaster.CodeReview;
+using Blaster.CodeReview.Syntax;
 
 namespace Blaster
 {
