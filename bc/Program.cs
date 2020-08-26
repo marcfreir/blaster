@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Blaster.CodeReview;
+using Blaster.CodeReview.Binding;
 using Blaster.CodeReview.Syntax;
 
 namespace Blaster
@@ -84,6 +85,10 @@ namespace Blaster
 
                 //var parser = new Parser(inputLine);
                 var syntaxTree = SyntaxTree.Parse(inputLine);
+                var binder = new Binder();
+                var boundExpression = binder.BindExpression(syntaxTree.Root);
+
+                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
 
                 if (_showTree)
                 {
@@ -92,9 +97,9 @@ namespace Blaster
                     Console.ResetColor();
                 }
 
-                if (!syntaxTree.Diagnostics.Any())
+                if (!diagnostics.Any())
                 {
-                    var evaluator = new Evaluator(syntaxTree.Root);
+                    var evaluator = new Evaluator(boundExpression);
                     var evaluationResult = evaluator.Evaluate();
                     Console.WriteLine(evaluationResult);
                 }
@@ -102,7 +107,7 @@ namespace Blaster
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
 
-                    foreach (var diagnostic in syntaxTree.Diagnostics)
+                    foreach (var diagnostic in diagnostics)
                     {
                         Console.WriteLine(diagnostic);
                     }

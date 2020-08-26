@@ -1,0 +1,4 @@
+            if (node is ParenthesizedExpressionSyntax parenthesizedExpressionSyntax)
+            {
+                return EvaluateExpression(parenthesizedExpressionSyntax.Expression);
+            }
