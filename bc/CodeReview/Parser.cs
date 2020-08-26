@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Blaster.CodeReview
 {
-    class Parser
+    internal sealed class Parser
     {
         private readonly SyntaxToken[] _tokenList;
         private List<string> _diagnostics = new List<string>();

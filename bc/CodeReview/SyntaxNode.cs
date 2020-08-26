@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Blaster.CodeReview
 {
-    abstract class SyntaxNode
+    public abstract class SyntaxNode
     {
         public abstract SyntaxKind Kind { get; }
 

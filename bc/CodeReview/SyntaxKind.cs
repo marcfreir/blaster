@@ -1,6 +1,6 @@
 namespace Blaster.CodeReview
 {
-    enum SyntaxKind
+    public enum SyntaxKind
     {
         NumberToken,
         WhitespaceToken,

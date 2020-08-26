@@ -5,12 +5,12 @@ using Blaster.CodeReview;
 
 namespace Blaster
 {
-    class Program
+    internal static class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //For the $udo commands
-            bool _showTree = false;
+            var _showTree = false;
             
             //For the header (template)
             var _blasterLineStart = "#####################################################";
@@ -94,11 +94,9 @@ namespace Blaster
 
                 if (_showTree)
                 {
-                    var textColor = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    
+                    Console.ForegroundColor = ConsoleColor.DarkGray;                    
                     PrettyPrint(syntaxTree.Root);
-                    Console.ForegroundColor = textColor;
+                    Console.ResetColor();
                 }
 
                 if (!syntaxTree.Diagnostics.Any())
@@ -109,14 +107,13 @@ namespace Blaster
                 }
                 else
                 {
-                    var textColor = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
 
                     foreach (var diagnostic in syntaxTree.Diagnostics)
                     {
                         Console.WriteLine(diagnostic);
                     }
-                    Console.ForegroundColor = textColor;
+                    Console.ResetColor();
                 }
             }
         }
