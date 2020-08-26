@@ -32,7 +32,7 @@ namespace Blaster.CodeReview
             _position++;
         }
 
-        public SyntaxToken NextToken()
+        public SyntaxToken Lex()
         {
             // <numbers>
             // + - * / ()
@@ -79,29 +79,20 @@ namespace Blaster.CodeReview
                 return new SyntaxToken(SyntaxKind.WhitespaceToken, start, text, null);
             }
 
-            if (CurrentChar == '+')
+            switch (CurrentChar)
             {
-                return new SyntaxToken(SyntaxKind.PlusToken, _position++, "+", null);
-            }
-            else if (CurrentChar == '-')
-            {
-                return new SyntaxToken(SyntaxKind.MinusToken, _position++, "-", null);
-            }
-            else if (CurrentChar == '*')
-            {
-                return new SyntaxToken(SyntaxKind.MultiplyToken, _position++, "*", null);
-            }
-            else if (CurrentChar == '/')
-            {
-                return new SyntaxToken(SyntaxKind.DivideToken, _position++, "/", null);
-            }
-            else if (CurrentChar == '(')
-            {
-                return new SyntaxToken(SyntaxKind.OpenParenthesisToken, _position++, "(", null);
-            }
-            else if (CurrentChar == ')')
-            {
-                return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
+                case '+':
+                    return new SyntaxToken(SyntaxKind.PlusToken, _position++, "+", null);
+                case '-':
+                    return new SyntaxToken(SyntaxKind.MinusToken, _position++, "-", null);
+                case '*':
+                    return new SyntaxToken(SyntaxKind.MultiplyToken, _position++, "*", null);
+                case '/':
+                    return new SyntaxToken(SyntaxKind.DivideToken, _position++, "/", null);
+                case '(':
+                    return new SyntaxToken(SyntaxKind.OpenParenthesisToken, _position++, "(", null);
+                case ')':
+                    return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
             }
 
             _diagnostics.Add($"ERROR:: Bad character input: '{CurrentChar}'");

@@ -15,7 +15,7 @@ namespace Blaster.CodeReview
         CloseParenthesisToken,
 
         // Expressions
-        NumberExpression,
+        LiteralExpression,
         BinaryExpression,
         ParenthesizedExpression
     }

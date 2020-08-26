@@ -35,56 +35,48 @@ namespace Blaster
                 }
 
                 /**********************************$UDO COMMANDS LIST - START************************************/
-                
-                //Basic commands for terminal operation ($udo)
-                if (inputLine == "$udo")
-                {
-                    var _sudo_message = "  $udo <command expected>!";
-                    Console.WriteLine(_sudo_message);
-                    continue;
-                }
 
-                //Showing the Tree
-                if (inputLine == "$udo showTree")
+                //Basic commands for terminal operation ($udo)
+                switch (inputLine)
                 {
-                    _showTree = true;
-                    Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
-                    continue;
-                }
-                //Disable Showing the Tree
-                if (inputLine == "$udo hideTree")
-                {
-                    //if (_showTree)
-                    //{
+                    case "$udo":
+                        {
+                            var _sudo_message = "  $udo <command expected>!";
+                            Console.WriteLine(_sudo_message);
+                            continue;
+                        }
+
+                    case "$udo showTree":
+                        _showTree = true;
+                        Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
+                        continue;
+                    case "$udo hideTree":
+                        //if (_showTree)
+                        //{
                         _showTree = false;
                         Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
                         continue;
-                    //}
-                }
-                
-                //Showing helper commands (Help Library)
-                if (inputLine == "$udo help" || inputLine == "$udo HELP")
-                {
-                    var _help_command = "[You typed >> $help]";
-                    var _type_line = "Just type the command...\n";
-                    var _exit_message = "$udo exit -> to exit the terminal. ";
-                    var _help_message = "$udo help -> to help hints. ";
-                    Console.WriteLine($"{_help_command}\n\n{_type_line}\n{_exit_message}\n{_help_message}");
-                    continue;
-                }
+                    case "$udo help":
+                    case "$udo HELP":
+                        {
+                            var _help_command = "[You typed >> $help]";
+                            var _type_line = "Just type the command...\n";
+                            var _exit_message = "$udo exit -> to exit the terminal. ";
+                            var _help_message = "$udo help -> to help hints. ";
+                            Console.WriteLine($"{_help_command}\n\n{_type_line}\n{_exit_message}\n{_help_message}");
+                            continue;
+                        }
 
-                //Clear the terminal
-                if (inputLine == "$udo clear")
-                {
-                    Console.Clear();
-                    continue;
-                }
-
-                //Just to exit the terminal
-                if (inputLine == "exit" || inputLine =="EXIT" || inputLine == "Exit" || inputLine == "$udo exit")
-                {
-                    Console.WriteLine(">>Blaster Terminal terminated with code 0<<");
-                    Environment.Exit(0);
+                    case "$udo clear":
+                        Console.Clear();
+                        continue;
+                    case "exit":
+                    case "EXIT":
+                    case "Exit":
+                    case "$udo exit":
+                        Console.WriteLine(">>Blaster Terminal terminated with code 0<<");
+                        Environment.Exit(0);
+                        break;
                 }
 
                 /**********************************$UDO COMMANDS LIST - END**************************************/
