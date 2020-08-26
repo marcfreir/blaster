@@ -26,6 +26,25 @@ namespace Blaster.CodeReview
             {
                 return (int) literalExpressionSyntax.LiteralToken.Value;
             }
+
+            //Evaluate UnaryExpression
+            if (node is UnaryExpressionSyntax unaryExpressionSyntax)
+            {
+                var operand = EvaluateExpression(unaryExpressionSyntax.Operand);
+
+                if (unaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.PlusToken)
+                {
+                    return operand;
+                }
+                else if (unaryExpressionSyntax.OperatorToken.Kind == SyntaxKind.MinusToken)
+                {
+                    return -operand;
+                }
+                else
+                {
+                    throw new Exception($"Unexpected unary operator {unaryExpressionSyntax.OperatorToken.Kind}");
+                }
+            }
             
             //Evaluate BinaryExpression
             if (node is BinaryExpressionSyntax binaryExpressionSyntax)

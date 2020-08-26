@@ -16,6 +16,7 @@ namespace Blaster.CodeReview
 
         // Expressions
         LiteralExpression,
+        UnaryExpression,
         BinaryExpression,
         ParenthesizedExpression
     }
