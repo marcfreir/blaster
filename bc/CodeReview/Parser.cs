@@ -52,7 +52,7 @@ namespace Blaster.CodeReview
             return currentToken;
         }
 
-        private SyntaxToken Match(SyntaxKind kind)
+        private SyntaxToken MatchToken(SyntaxKind kind)
         {
             if (CurrentToken.Kind == kind)
             {
@@ -63,20 +63,20 @@ namespace Blaster.CodeReview
             return new SyntaxToken(kind, CurrentToken.Position, null, null);
         }
 
-        private ExpressionSyntax ParseExpression()
-        {
-            return ParseTermExpression();
-        }
-
         public SyntaxTree Parse()
         {
-            var expression = ParseTermExpression();
-            var endOfFileToken = Match(SyntaxKind.EndOfFileToken);
+            var expression = ParseExpression();
+            var endOfFileToken = MatchToken(SyntaxKind.EndOfFileToken);
 
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
-        private ExpressionSyntax ParseTermExpression()
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseTerm();
+        }
+
+        private ExpressionSyntax ParseTerm()
         {
             var leftSide = ParseFactorExpression();
 
@@ -110,11 +110,11 @@ namespace Blaster.CodeReview
             {
                 var leftSide = NextToken();
                 var expression = ParseExpression();
-                var rightSide = Match(SyntaxKind.CloseParenthesisToken);
+                var rightSide = MatchToken(SyntaxKind.CloseParenthesisToken);
 
                 return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
             }
-            var numberToken = Match(SyntaxKind.NumberToken);
+            var numberToken = MatchToken(SyntaxKind.NumberToken);
             return new NumberExpressionSyntax(numberToken);
         }
     }
