@@ -1,0 +1,32 @@
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseTerm();
+        }
+
+        private ExpressionSyntax ParseTerm()
+        {
+            var leftSide = ParseFactorExpression();
+
+            while (CurrentToken.Kind == SyntaxKind.PlusToken || CurrentToken.Kind == SyntaxKind.MinusToken)
+            {
+                var operatorToken = NextToken();
+                var rightSide = ParseFactorExpression();
+                leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
+            }
+
+            return leftSide;
+        }
+
+        private ExpressionSyntax ParseFactorExpression()
+        {
+            var leftSide = ParsePrimaryExpression();
+
+            while (CurrentToken.Kind == SyntaxKind.MultiplyToken || CurrentToken.Kind == SyntaxKind.DivideToken)
+            {
+                var operatorToken = NextToken();
+                var rightSide = ParsePrimaryExpression();
+                leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
+            }
+
+            return leftSide;
+        }

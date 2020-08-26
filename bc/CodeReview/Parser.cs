@@ -71,38 +71,26 @@ namespace Blaster.CodeReview
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
-        private ExpressionSyntax ParseExpression()
-        {
-            return ParseTerm();
-        }
 
-        private ExpressionSyntax ParseTerm()
-        {
-            var leftSide = ParseFactorExpression();
-
-            while (CurrentToken.Kind == SyntaxKind.PlusToken || CurrentToken.Kind == SyntaxKind.MinusToken)
-            {
-                var operatorToken = NextToken();
-                var rightSide = ParseFactorExpression();
-                leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
-            }
-
-            return leftSide;
-        }
-
-        private ExpressionSyntax ParseFactorExpression()
+        private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
         {
             var leftSide = ParsePrimaryExpression();
-
-            while (CurrentToken.Kind == SyntaxKind.MultiplyToken || CurrentToken.Kind == SyntaxKind.DivideToken)
+            
+            while (true)
             {
+                var precedence = CurrentToken.Kind.GetBinaryOperatorPrecedence();
+                if (precedence == 0 || precedence <= parentPrecedence)
+                {
+                    break;
+                }
+
                 var operatorToken = NextToken();
-                var rightSide = ParsePrimaryExpression();
+                var rightSide = ParseExpression(precedence);
                 leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
             }
-
             return leftSide;
         }
+
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
