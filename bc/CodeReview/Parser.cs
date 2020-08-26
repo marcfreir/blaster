@@ -74,7 +74,19 @@ namespace Blaster.CodeReview
 
         private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
         {
-            var leftSide = ParsePrimaryExpression();
+            ExpressionSyntax leftSide;
+            var unaryOperatorPrecedence = CurrentToken.Kind.GetUnaryOperatorPrecedence();
+
+            if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
+            {
+                var operatorToken = NextToken();
+                var operand = ParseExpression(unaryOperatorPrecedence);
+                leftSide = new UnaryExpressionSyntax(operatorToken, operand);
+            }
+            else
+            {
+                leftSide = ParsePrimaryExpression();
+            }
             
             while (true)
             {
