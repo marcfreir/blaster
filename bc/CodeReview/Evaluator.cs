@@ -21,10 +21,10 @@ namespace Blaster.CodeReview
         private int EvaluateExpression(ExpressionSyntax node)
         {
             
-            //Evaluate NumberExpression
-            if (node is NumberExpressionSyntax numberExpressionSyntax)
+            //Evaluate LiteralExpression
+            if (node is LiteralExpressionSyntax literalExpressionSyntax)
             {
-                return (int) numberExpressionSyntax.NumberToken.Value;
+                return (int) literalExpressionSyntax.LiteralToken.Value;
             }
             
             //Evaluate BinaryExpression

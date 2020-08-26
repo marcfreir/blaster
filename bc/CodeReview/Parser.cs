@@ -115,7 +115,7 @@ namespace Blaster.CodeReview
                 return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
             }
             var numberToken = MatchToken(SyntaxKind.NumberToken);
-            return new NumberExpressionSyntax(numberToken);
+            return new LiteralExpressionSyntax(numberToken);
         }
     }
 }
