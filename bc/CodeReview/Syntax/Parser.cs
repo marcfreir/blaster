@@ -114,6 +114,12 @@ namespace Blaster.CodeReview.Syntax
 
                 return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
             }
+            else if (CurrentToken.Kind == SyntaxKind.TrueKeyword || CurrentToken.Kind == SyntaxKind.FalseKeyword)
+            {
+                var value = CurrentToken.Kind == SyntaxKind.TrueKeyword;
+                return new LiteralExpressionSyntax(CurrentToken, value);
+            }
+
             var numberToken = MatchToken(SyntaxKind.NumberToken);
             return new LiteralExpressionSyntax(numberToken);
         }

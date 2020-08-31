@@ -13,6 +13,11 @@ namespace Blaster.CodeReview.Syntax
         DivideToken,
         OpenParenthesisToken,
         CloseParenthesisToken,
+        IdentifierToken,
+
+        // Keywords
+        TrueKeyword,
+        FalseKeyword,
 
         // Expressions
         LiteralExpression,

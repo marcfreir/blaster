@@ -1,3 +1,5 @@
+using System;
+
 namespace Blaster.CodeReview.Syntax
 {
     internal static class SyntaxFacts
@@ -37,6 +39,25 @@ namespace Blaster.CodeReview.Syntax
                 default:
                     {
                         return 0;
+                    }
+            }
+        }
+
+        public static SyntaxKind GetKeywordKind(string text)
+        {
+            switch (text)
+            {
+                case "true":
+                    {
+                        return SyntaxKind.TrueKeyword;
+                    }
+                case "false":
+                    {
+                        return SyntaxKind.FalseKeyword;
+                    }
+                default:
+                    {
+                        return SyntaxKind.IdentifierToken;
                     }
             }
         }

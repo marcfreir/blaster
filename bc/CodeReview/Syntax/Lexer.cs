@@ -79,6 +79,24 @@ namespace Blaster.CodeReview.Syntax
                 return new SyntaxToken(SyntaxKind.WhitespaceToken, start, text, null);
             }
 
+            // True
+            // False
+            if (char.IsLetter(CurrentChar))
+            {
+                var start = _position;
+
+                while (char.IsLetter(CurrentChar))
+                {
+                    NextChar();
+                }
+
+                var length = _position - start;
+                var text = _text.Substring(start, length);
+                var kind = SyntaxFacts.GetKeywordKind(text);
+                //int.TryParse(text, out var value);
+                return new SyntaxToken(kind, start, text, null);
+            }
+
             switch (CurrentChar)
             {
                 case '+':
