@@ -34,7 +34,7 @@ namespace Blaster.CodeReview
             {
                 var operand = EvaluateExpression(boundUnaryExpression.Operand);
 
-                switch (boundUnaryExpression.OperatorKind)
+                switch (boundUnaryExpression.OperatorUnit.UnaryOperatorKind)
                 {
                     case BoundUnaryOperatorKind.Identity:
                         return (int) operand;
@@ -43,7 +43,7 @@ namespace Blaster.CodeReview
                     case BoundUnaryOperatorKind.LogicalNegation:
                         return (bool) operand;
                     default:
-                        throw new Exception($"Unexpected unary operator {boundUnaryExpression.OperatorKind}");
+                        throw new Exception($"Unexpected unary operator {boundUnaryExpression.OperatorUnit}");
                 }
             }
             
@@ -53,7 +53,7 @@ namespace Blaster.CodeReview
                 var leftSide = EvaluateExpression(boundBinaryExpression.LeftSide);
                 var rightSide = EvaluateExpression(boundBinaryExpression.RightSide);
 
-                switch (boundBinaryExpression.OperatorKind)
+                switch (boundBinaryExpression.OperatorUnit.BinaryOperatorKind)
                 {
                     case BoundBinaryOperatorKind.Addition:
                         return (int) leftSide + (int) rightSide;
@@ -68,7 +68,7 @@ namespace Blaster.CodeReview
                     case BoundBinaryOperatorKind.LogicalOr:
                         return (bool) leftSide || (bool) rightSide;
                     default:
-                        throw new Exception($"Unexpected binary operator {boundBinaryExpression.OperatorKind}");
+                        throw new Exception($"Unexpected binary operator {boundBinaryExpression.OperatorUnit}");
                 }
             }
 

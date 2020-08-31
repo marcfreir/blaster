@@ -4,18 +4,17 @@ namespace Blaster.CodeReview.Binding
 {
     internal sealed class BoundBinaryExpression : BoundExpression
     {
-        public BoundBinaryExpression(BoundExpression leftSide, BoundBinaryOperatorKind operatorKind, BoundExpression rightSide)
+        public BoundBinaryExpression(BoundExpression leftSide, BoundBinaryOperator operatorUnit, BoundExpression rightSide)
         {
             LeftSide = leftSide;
-            OperatorKind = operatorKind;
+            OperatorUnit = operatorUnit;
             RightSide = rightSide;
-            //
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
         public override Type Type => LeftSide.Type;
         public BoundExpression LeftSide { get; }
-        public BoundBinaryOperatorKind OperatorKind { get; }
+        public BoundBinaryOperator OperatorUnit { get; }
         public BoundExpression RightSide { get; }
 
     }

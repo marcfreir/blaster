@@ -1,0 +1,77 @@
+        private BoundUnaryOperatorKind? BindUnaryOperatorKind(SyntaxKind syntaxKind, Type operandType)
+        {
+            if (operandType == typeof(int))
+            {
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.PlusToken:
+                        {
+                            return BoundUnaryOperatorKind.Identity;
+                        }
+                    case SyntaxKind.MinusToken:
+                        {
+                            return BoundUnaryOperatorKind.Negation;
+                        }
+                }
+
+            }
+
+            if (operandType == typeof(bool))
+            {
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.ExclamationToken:
+                        {
+                            return BoundUnaryOperatorKind.LogicalNegation;
+                        }
+                }
+
+            }
+
+            {
+                return null;
+            }
+        }
+        
+        private BoundBinaryOperatorKind? BindBinaryOperatorKind(SyntaxKind syntaxKind, Type leftSideType, Type rightSideType)
+        {
+            if (leftSideType == typeof(int) && rightSideType == typeof(int))
+            {
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.PlusToken:
+                        {
+                            return BoundBinaryOperatorKind.Addition;
+                        }
+                    case SyntaxKind.MinusToken:
+                        {
+                            return BoundBinaryOperatorKind.Subtraction;
+                        }
+                    case SyntaxKind.MultiplyToken:
+                        {
+                            return BoundBinaryOperatorKind.Multiplication;
+                        }
+                    case SyntaxKind.DivideToken:
+                        {
+                            return BoundBinaryOperatorKind.Division;
+                        }
+                }
+            }
+
+            if (leftSideType == typeof(bool) && rightSideType == typeof(bool))
+            {
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.AmpersandToken:
+                        {
+                            return BoundBinaryOperatorKind.LogicalAnd;
+                        }
+                    case SyntaxKind.PipeToken:
+                        {
+                            return BoundBinaryOperatorKind.LogicalOr;
+                        }
+                }
+            }
+
+            return null;
+        }
