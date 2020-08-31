@@ -32,14 +32,16 @@ namespace Blaster.CodeReview
             //Evaluate UnaryExpression
             if (node is BoundUnaryExpression boundUnaryExpression)
             {
-                var operand = (int) EvaluateExpression(boundUnaryExpression.Operand);
+                var operand = EvaluateExpression(boundUnaryExpression.Operand);
 
                 switch (boundUnaryExpression.OperatorKind)
                 {
                     case BoundUnaryOperatorKind.Identity:
-                        return operand;
+                        return (int) operand;
                     case BoundUnaryOperatorKind.Negation:
-                        return -operand;
+                        return -(int) operand;
+                    case BoundUnaryOperatorKind.LogicalNegation:
+                        return (bool) operand;
                     default:
                         throw new Exception($"Unexpected unary operator {boundUnaryExpression.OperatorKind}");
                 }
@@ -48,19 +50,23 @@ namespace Blaster.CodeReview
             //Evaluate BinaryExpression
             if (node is BoundBinaryExpression boundBinaryExpression)
             {
-                var leftSide = (int) EvaluateExpression(boundBinaryExpression.LeftSide);
-                var rightSide = (int) EvaluateExpression(boundBinaryExpression.RightSide);
+                var leftSide = EvaluateExpression(boundBinaryExpression.LeftSide);
+                var rightSide = EvaluateExpression(boundBinaryExpression.RightSide);
 
                 switch (boundBinaryExpression.OperatorKind)
                 {
                     case BoundBinaryOperatorKind.Addition:
-                        return leftSide + rightSide;
+                        return (int) leftSide + (int) rightSide;
                     case BoundBinaryOperatorKind.Subtraction:
-                        return leftSide - rightSide;
+                        return (int) leftSide - (int) rightSide;
                     case BoundBinaryOperatorKind.Multiplication:
-                        return leftSide * rightSide;
+                        return (int) leftSide * (int) rightSide;
                     case BoundBinaryOperatorKind.Division:
-                        return leftSide / rightSide;
+                        return (int) leftSide / (int) rightSide;
+                    case BoundBinaryOperatorKind.LogicalAnd:
+                        return (bool) leftSide && (bool) rightSide;
+                    case BoundBinaryOperatorKind.LogicalOr:
+                        return (bool) leftSide || (bool) rightSide;
                     default:
                         throw new Exception($"Unexpected binary operator {boundBinaryExpression.OperatorKind}");
                 }

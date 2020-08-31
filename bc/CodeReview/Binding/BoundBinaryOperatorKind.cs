@@ -5,6 +5,8 @@ namespace Blaster.CodeReview.Binding
         Addition,
         Subtraction,
         Multiplication,
-        Division
+        Division,
+        LogicalAnd,
+        LogicalOr
     }
 }

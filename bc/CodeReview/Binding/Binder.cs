@@ -69,58 +69,80 @@ namespace Blaster.CodeReview.Binding
 
         private BoundUnaryOperatorKind? BindUnaryOperatorKind(SyntaxKind syntaxKind, Type operandType)
         {
-            if (operandType != typeof(int))
+            if (operandType == typeof(int))
             {
-                return null;
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.PlusToken:
+                        {
+                            return BoundUnaryOperatorKind.Identity;
+                        }
+                    case SyntaxKind.MinusToken:
+                        {
+                            return BoundUnaryOperatorKind.Negation;
+                        }
+                }
+
             }
 
-            switch (syntaxKind)
+            if (operandType == typeof(bool))
             {
-                case SyntaxKind.PlusToken:
-                    {
-                        return BoundUnaryOperatorKind.Identity;
-                    }
-                case SyntaxKind.MinusToken:
-                    {
-                        return BoundUnaryOperatorKind.Negation;
-                    }
-                default:
-                    {
-                        throw new Exception($"Unexpected unary operator {syntaxKind}");
-                    }
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.ExclamationToken:
+                        {
+                            return BoundUnaryOperatorKind.LogicalNegation;
+                        }
+                }
+
+            }
+
+            {
+                return null;
             }
         }
 
         private BoundBinaryOperatorKind? BindBinaryOperatorKind(SyntaxKind syntaxKind, Type leftSideType, Type rightSideType)
         {
-            if (leftSideType != typeof(int) || rightSideType != typeof(int))
+            if (leftSideType == typeof(int) && rightSideType == typeof(int))
             {
-                return null;
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.PlusToken:
+                        {
+                            return BoundBinaryOperatorKind.Addition;
+                        }
+                    case SyntaxKind.MinusToken:
+                        {
+                            return BoundBinaryOperatorKind.Subtraction;
+                        }
+                    case SyntaxKind.MultiplyToken:
+                        {
+                            return BoundBinaryOperatorKind.Multiplication;
+                        }
+                    case SyntaxKind.DivideToken:
+                        {
+                            return BoundBinaryOperatorKind.Division;
+                        }
+                }
             }
 
-            switch (syntaxKind)
+            if (leftSideType == typeof(bool) && rightSideType == typeof(bool))
             {
-                case SyntaxKind.PlusToken:
-                    {
-                        return BoundBinaryOperatorKind.Addition;
-                    }
-                case SyntaxKind.MinusToken:
-                    {
-                        return BoundBinaryOperatorKind.Subtraction;
-                    }
-                case SyntaxKind.MultiplyToken:
-                    {
-                        return BoundBinaryOperatorKind.Multiplication;
-                    }
-                case SyntaxKind.DivideToken:
-                    {
-                        return BoundBinaryOperatorKind.Division;
-                    }
-                default:
-                    {
-                        throw new Exception($"Unexpected binary operator {syntaxKind}");
-                    }
+                switch (syntaxKind)
+                {
+                    case SyntaxKind.AmpersandToken:
+                        {
+                            return BoundBinaryOperatorKind.LogicalAnd;
+                        }
+                    case SyntaxKind.PipeToken:
+                        {
+                            return BoundBinaryOperatorKind.LogicalOr;
+                        }
+                }
             }
+
+            return null;
         }
     }
 }

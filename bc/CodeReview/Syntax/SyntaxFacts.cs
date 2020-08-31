@@ -10,8 +10,9 @@ namespace Blaster.CodeReview.Syntax
             {
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
+                case SyntaxKind.ExclamationToken:
                     {
-                        return 3;
+                        return 5;
                     }
                 
                 default:
@@ -28,10 +29,18 @@ namespace Blaster.CodeReview.Syntax
                 case SyntaxKind.MultiplyToken:
                 case SyntaxKind.DivideToken:
                     {
-                        return 2;
+                        return 4;
                     }
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
+                    {
+                        return 3;
+                    }
+                case SyntaxKind.AmpersandToken:
+                    {
+                        return 2;
+                    }
+                case SyntaxKind.PipeToken:
                     {
                         return 1;
                     }

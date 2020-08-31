@@ -13,6 +13,9 @@ namespace Blaster.CodeReview.Syntax
         DivideToken,
         OpenParenthesisToken,
         CloseParenthesisToken,
+        ExclamationToken,
+        AmpersandToken,
+        PipeToken,
         IdentifierToken,
 
         // Keywords
@@ -23,6 +26,6 @@ namespace Blaster.CodeReview.Syntax
         LiteralExpression,
         UnaryExpression,
         BinaryExpression,
-        ParenthesizedExpression
+        ParenthesizedExpression,
     }
 }

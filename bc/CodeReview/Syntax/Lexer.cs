@@ -14,17 +14,18 @@ namespace Blaster.CodeReview.Syntax
 
         public IEnumerable<string> Diagnostics => _diagnostics;
 
-        private char CurrentChar
-        {
-            get
-            {
-                if (_position >= _text.Length)
-                {
-                    return '\0';
-                }
+        private char CurrentChar => Peek(0);
+        private char LookAhead => Peek(1);
 
-                return _text[_position];
+        private char Peek(int offset)
+        {
+            var index = _position + offset;
+            if (index >= _text.Length)
+            {
+                return '\0';
             }
+
+            return _text[index];
         }
 
         private void NextChar()
@@ -100,17 +101,50 @@ namespace Blaster.CodeReview.Syntax
             switch (CurrentChar)
             {
                 case '+':
+                {
                     return new SyntaxToken(SyntaxKind.PlusToken, _position++, "+", null);
+                }
                 case '-':
+                {
                     return new SyntaxToken(SyntaxKind.MinusToken, _position++, "-", null);
+                }
                 case '*':
+                {
                     return new SyntaxToken(SyntaxKind.MultiplyToken, _position++, "*", null);
+                }
                 case '/':
+                {
                     return new SyntaxToken(SyntaxKind.DivideToken, _position++, "/", null);
+                }
                 case '(':
+                {
                     return new SyntaxToken(SyntaxKind.OpenParenthesisToken, _position++, "(", null);
+                }
                 case ')':
+                {
                     return new SyntaxToken(SyntaxKind.CloseParenthesisToken, _position++, ")", null);
+                }
+                case '!':
+                {
+                    return new SyntaxToken(SyntaxKind.ExclamationToken, _position++, "!", null);
+                }
+                case '&':
+                {
+                    if (LookAhead == '&')
+                    {
+                        return new SyntaxToken(SyntaxKind.AmpersandToken, _position += 2, "&&", null);
+                    }
+                    break;
+                }
+                case '|':
+                {
+                    if (LookAhead == '|')
+                    {
+                        return new SyntaxToken(SyntaxKind.PipeToken, _position += 2, "||", null);
+                    }
+                    break;
+                }
+                
             }
 
             _diagnostics.Add($"ERROR:: Bad character input: '{CurrentChar}'");
