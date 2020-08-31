@@ -15,24 +15,24 @@ namespace Blaster.CodeReview
             //
         }
 
-        public int Evaluate()
+        public object Evaluate()
         {
             return EvaluateExpression(_root);
         }
 
-        private int EvaluateExpression(BoundExpression node)
+        private object EvaluateExpression(BoundExpression node)
         {
             
             //Evaluate LiteralExpression
             if (node is BoundLiteralExpression boundLiteralExpression)
             {
-                return (int) boundLiteralExpression.Value;
+                return boundLiteralExpression.Value;
             }
 
             //Evaluate UnaryExpression
             if (node is BoundUnaryExpression boundUnaryExpression)
             {
-                var operand = EvaluateExpression(boundUnaryExpression.Operand);
+                var operand = (int) EvaluateExpression(boundUnaryExpression.Operand);
 
                 switch (boundUnaryExpression.OperatorKind)
                 {
@@ -48,8 +48,8 @@ namespace Blaster.CodeReview
             //Evaluate BinaryExpression
             if (node is BoundBinaryExpression boundBinaryExpression)
             {
-                var leftSide = EvaluateExpression(boundBinaryExpression.LeftSide);
-                var rightSide = EvaluateExpression(boundBinaryExpression.RightSide);
+                var leftSide = (int) EvaluateExpression(boundBinaryExpression.LeftSide);
+                var rightSide = (int) EvaluateExpression(boundBinaryExpression.RightSide);
 
                 switch (boundBinaryExpression.OperatorKind)
                 {

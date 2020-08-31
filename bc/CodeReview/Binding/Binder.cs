@@ -34,7 +34,7 @@ namespace Blaster.CodeReview.Binding
 
         private BoundExpression BindLiteralExpression(LiteralExpressionSyntax expressionSyntax)
         {
-            var value = expressionSyntax.LiteralToken.Value as int? ?? 0;
+            var value = expressionSyntax.Value ?? 0;
             return new BoundLiteralExpression(value);
         }
 

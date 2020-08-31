@@ -106,22 +106,31 @@ namespace Blaster.CodeReview.Syntax
 
         private ExpressionSyntax ParsePrimaryExpression()
         {
-            if (CurrentToken.Kind == SyntaxKind.OpenParenthesisToken)
+            switch (CurrentToken.Kind)
             {
-                var leftSide = NextToken();
-                var expression = ParseExpression();
-                var rightSide = MatchToken(SyntaxKind.CloseParenthesisToken);
+                case SyntaxKind.OpenParenthesisToken:
+                    {
+                        var leftSide = NextToken();
+                        var expression = ParseExpression();
+                        var rightSide = MatchToken(SyntaxKind.CloseParenthesisToken);
 
-                return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
-            }
-            else if (CurrentToken.Kind == SyntaxKind.TrueKeyword || CurrentToken.Kind == SyntaxKind.FalseKeyword)
-            {
-                var value = CurrentToken.Kind == SyntaxKind.TrueKeyword;
-                return new LiteralExpressionSyntax(CurrentToken, value);
+                        return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
+                    }
+
+                case SyntaxKind.TrueKeyword:
+                case SyntaxKind.FalseKeyword:
+                    {
+                        var keywordToken = NextToken();
+                        var value = CurrentToken.Kind == SyntaxKind.TrueKeyword;
+                        return new LiteralExpressionSyntax(keywordToken, value);
+                    }
+                default:
+                    {
+                        var numberToken = MatchToken(SyntaxKind.NumberToken);
+                        return new LiteralExpressionSyntax(numberToken);
+                    }
             }
 
-            var numberToken = MatchToken(SyntaxKind.NumberToken);
-            return new LiteralExpressionSyntax(numberToken);
         }
     }
 }
