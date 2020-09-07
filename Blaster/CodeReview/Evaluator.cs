@@ -1,6 +1,5 @@
 ﻿using System;
 using Blaster.CodeReview.Binding;
-using Blaster.CodeReview.Syntax;
 
 namespace Blaster.CodeReview
 {

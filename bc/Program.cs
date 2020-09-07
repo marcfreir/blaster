@@ -85,10 +85,11 @@ namespace Blaster
 
                 //var parser = new Parser(inputLine);
                 var syntaxTree = SyntaxTree.Parse(inputLine);
-                var binder = new Binder();
-                var boundExpression = binder.BindExpression(syntaxTree.Root);
+                var compilation = new Compilation(syntaxTree);
+                var result = compilation.Evaluate();
+                //var boundExpression = compilation.BindExpression(syntaxTree.Root);
 
-                var diagnostics = syntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
+                var diagnostics = result.Diagnostics;
 
                 if (_showTree)
                 {
@@ -99,9 +100,10 @@ namespace Blaster
 
                 if (!diagnostics.Any())
                 {
-                    var evaluator = new Evaluator(boundExpression);
-                    var evaluationResult = evaluator.Evaluate();
-                    Console.WriteLine(evaluationResult);
+                    //var evaluator = new Evaluator(boundExpression);
+                    //var evaluationResult = evaluator.Evaluate();
+                    //Console.WriteLine(evaluationResult);
+                    Console.WriteLine(result.Value);
                 }
                 else
                 {
