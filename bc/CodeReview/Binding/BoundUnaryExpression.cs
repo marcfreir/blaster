@@ -11,7 +11,7 @@ namespace Blaster.CodeReview.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
-        public override Type Type => Operand.Type;
+        public override Type Type => OperatorUnit.Type;
         public BoundUnaryOperator OperatorUnit { get; }
         public BoundExpression Operand { get; }
 

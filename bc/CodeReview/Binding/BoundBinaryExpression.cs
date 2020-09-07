@@ -12,7 +12,7 @@ namespace Blaster.CodeReview.Binding
         }
 
         public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
-        public override Type Type => LeftSide.Type;
+        public override Type Type => OperatorUnit.Type;
         public BoundExpression LeftSide { get; }
         public BoundBinaryOperator OperatorUnit { get; }
         public BoundExpression RightSide { get; }

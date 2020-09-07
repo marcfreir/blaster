@@ -19,14 +19,14 @@ namespace Blaster.CodeReview.Binding
             BinaryOperatorKind = binaryOperatorKind;
             LeftType = leftType;
             RightType = rightType;
-            ResultType = resultType;
+            Type = resultType;
         }
 
         public SyntaxKind SyntaxKind { get; }
         public BoundBinaryOperatorKind BinaryOperatorKind { get; }
         public Type LeftType { get; }
         public Type RightType { get; }
-        public Type ResultType { get; }
+        public Type Type { get; }
 
         private static BoundBinaryOperator[] _binaryOperators = 
         {

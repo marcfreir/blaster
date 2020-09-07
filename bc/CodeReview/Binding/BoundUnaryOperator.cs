@@ -15,13 +15,13 @@ namespace Blaster.CodeReview.Binding
             SyntaxKind = syntaxKind;
             UnaryOperatorKind = unaryOperatorKind;
             OperandType = operandType;
-            ResultType = resultType;
+            Type = resultType;
         }
 
         public SyntaxKind SyntaxKind { get; }
         public BoundUnaryOperatorKind UnaryOperatorKind { get; }
         public Type OperandType { get; }
-        public Type ResultType { get; }
+        public Type Type { get; }
 
         private static BoundUnaryOperator[] _unaryOperators = 
         {
