@@ -9,6 +9,10 @@ namespace Blaster.CodeReview.Binding
         : this(syntaxKind, binaryOperatorKind, type, type, type)
         {
         }
+        private BoundBinaryOperator(SyntaxKind syntaxKind, BoundBinaryOperatorKind binaryOperatorKind, Type operandType, Type resultType) 
+        : this(syntaxKind, binaryOperatorKind, operandType, operandType, resultType)
+        {
+        }
         private BoundBinaryOperator(SyntaxKind syntaxKind, BoundBinaryOperatorKind binaryOperatorKind, Type leftType, Type rightType, Type resultType)
         {
             SyntaxKind = syntaxKind;
@@ -30,9 +34,13 @@ namespace Blaster.CodeReview.Binding
             new BoundBinaryOperator(SyntaxKind.MinusToken, BoundBinaryOperatorKind.Subtraction, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.MultiplyToken, BoundBinaryOperatorKind.Multiplication, typeof(int)),
             new BoundBinaryOperator(SyntaxKind.DivideToken, BoundBinaryOperatorKind.Division, typeof(int)),
+            new BoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equality, typeof(int), typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.ExclamationEqualsToken, BoundBinaryOperatorKind.Inequality, typeof(int), typeof(bool)),
 
             new BoundBinaryOperator(SyntaxKind.AmpersandAmpersandToken, BoundBinaryOperatorKind.LogicalAnd, typeof(bool)),
-            new BoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool))
+            new BoundBinaryOperator(SyntaxKind.PipePipeToken, BoundBinaryOperatorKind.LogicalOr, typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.EqualsEqualsToken, BoundBinaryOperatorKind.Equality, typeof(bool)),
+            new BoundBinaryOperator(SyntaxKind.ExclamationEqualsToken, BoundBinaryOperatorKind.Inequality, typeof(bool)),
         };
 
         public static BoundBinaryOperator Bind(SyntaxKind syntaxKind, Type leftType, Type rightType)

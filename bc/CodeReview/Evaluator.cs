@@ -67,6 +67,10 @@ namespace Blaster.CodeReview
                         return (bool) leftSide && (bool) rightSide;
                     case BoundBinaryOperatorKind.LogicalOr:
                         return (bool) leftSide || (bool) rightSide;
+                    case BoundBinaryOperatorKind.Equality:
+                        return Equals(leftSide, rightSide);
+                    case BoundBinaryOperatorKind.Inequality:
+                        return !Equals(leftSide, rightSide);
                     default:
                         throw new Exception($"Unexpected binary operator {boundBinaryExpression.OperatorUnit}");
                 }

@@ -12,7 +12,7 @@ namespace Blaster.CodeReview.Syntax
                 case SyntaxKind.MinusToken:
                 case SyntaxKind.ExclamationToken:
                     {
-                        return 5;
+                        return 6;
                     }
                 
                 default:
@@ -29,10 +29,15 @@ namespace Blaster.CodeReview.Syntax
                 case SyntaxKind.MultiplyToken:
                 case SyntaxKind.DivideToken:
                     {
-                        return 4;
+                        return 5;
                     }
                 case SyntaxKind.PlusToken:
                 case SyntaxKind.MinusToken:
+                    {
+                        return 4;
+                    }
+                case SyntaxKind.EqualsEqualsToken:
+                case SyntaxKind.ExclamationEqualsToken:
                     {
                         return 3;
                     }

@@ -7,6 +7,8 @@ namespace Blaster.CodeReview.Binding
         Multiplication,
         Division,
         LogicalAnd,
-        LogicalOr
+        LogicalOr,
+        Equality,
+        Inequality
     }
 }
