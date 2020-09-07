@@ -36,11 +36,11 @@ namespace Blaster.CodeReview.Syntax
                     {
                         return 3;
                     }
-                case SyntaxKind.AmpersandToken:
+                case SyntaxKind.AmpersandAmpersandToken:
                     {
                         return 2;
                     }
-                case SyntaxKind.PipeToken:
+                case SyntaxKind.PipePipeToken:
                     {
                         return 1;
                     }
