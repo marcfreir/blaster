@@ -25,6 +25,10 @@ namespace Blaster.CodeReview.Binding
                     {
                         return BindBinaryExpression((BinaryExpressionSyntax)expressionSyntax);
                     }
+                case SyntaxKind.ParenthesizedExpression:
+                    {
+                        return BindExpression(((ParenthesizedExpressionSyntax)expressionSyntax).Expression);
+                    }
                 default:
                     {
                         throw new Exception($"Unexpected syntax {expressionSyntax.Kind}");

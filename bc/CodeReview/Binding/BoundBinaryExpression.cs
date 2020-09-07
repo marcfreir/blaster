@@ -11,7 +11,7 @@ namespace Blaster.CodeReview.Binding
             RightSide = rightSide;
         }
 
-        public override BoundNodeKind Kind => BoundNodeKind.UnaryExpression;
+        public override BoundNodeKind Kind => BoundNodeKind.BinaryExpression;
         public override Type Type => OperatorUnit.Type;
         public BoundExpression LeftSide { get; }
         public BoundBinaryOperator OperatorUnit { get; }
