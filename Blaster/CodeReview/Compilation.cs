@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Blaster.CodeReview.Binding;
 using Blaster.CodeReview.Syntax;
@@ -7,29 +8,28 @@ namespace Blaster.CodeReview
 {
     public sealed class Compilation
     {
-        public Compilation(SyntaxTree syntax)
+        public Compilation(SyntaxTree syntaxTree)
         {
-            Syntax = syntax;
+            SyntaxTree = syntaxTree;
         }
 
-        public SyntaxTree Syntax { get; }
-        
-        public EvaluationResult Evaluate()
+        public SyntaxTree SyntaxTree { get; }
+
+        public EvaluationResult Evaluate(Dictionary<VariableSymbol, object> variables)
         {
-            var binder = new Binder();
-            var boundExpression = binder.BindExpression(Syntax.Root);
-            
-            var diagnostics = Syntax.Diagnostics.Concat(binder.Diagnostics).ToArray();
+            var binder = new Binder(variables);
+            var boundExpression = binder.BindExpression(SyntaxTree.Root);
+            var diagnostics = SyntaxTree.Diagnostics.Concat(binder.Diagnostics).ToArray();
 
             if (diagnostics.Any())
             {
                 return new EvaluationResult(diagnostics, null);
             }
 
-            var evaluator = new Evaluator(boundExpression);
+            var evaluator = new Evaluator(boundExpression, variables);
             var value = evaluator.Evaluate();
 
-            return new EvaluationResult(Array.Empty<string>(), value);
+            return new EvaluationResult(Array.Empty<Diagnostic>(), value);
         }
     }
 }

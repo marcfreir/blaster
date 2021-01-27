@@ -5,7 +5,7 @@ namespace Blaster.CodeReview.Syntax
     internal sealed class Parser
     {
         private readonly SyntaxToken[] _tokenList;
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
         private int _position;
 
         public Parser(string text)
@@ -29,7 +29,7 @@ namespace Blaster.CodeReview.Syntax
             _diagnostics.AddRange(lexer.Diagnostics);
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         private SyntaxToken Peek(int offset)
         {
@@ -59,7 +59,7 @@ namespace Blaster.CodeReview.Syntax
                 return NextToken();
             }
             
-            _diagnostics.Add($"ERROR:: Unexpected token <{CurrentToken.Kind}>, expected <{kind}>");
+            _diagnostics.ReportUnexpectedToken(CurrentToken.Span, CurrentToken.Kind, kind);
             return new SyntaxToken(kind, CurrentToken.Position, null, null);
         }
 
@@ -71,8 +71,25 @@ namespace Blaster.CodeReview.Syntax
             return new SyntaxTree(_diagnostics, expression, endOfFileToken);
         }
 
+        private ExpressionSyntax ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
 
-        private ExpressionSyntax ParseExpression(int parentPrecedence = 0)
+        private ExpressionSyntax ParseAssignmentExpression()
+        {
+            if (Peek(0).Kind == SyntaxKind.IdentifierToken && Peek(1).Kind == SyntaxKind.EqualsEqualsToken)
+            {
+                var identifierToken = NextToken();
+                var operatorToken = NextToken();
+                var rightSide = ParseAssignmentExpression();
+                return new AssignmentExpressionSyntax(identifierToken, operatorToken, rightSide);
+            }
+
+            return ParseBinaryExpression();
+        }
+
+        private ExpressionSyntax ParseBinaryExpression(int parentPrecedence = 0)
         {
             ExpressionSyntax leftSide;
             var unaryOperatorPrecedence = CurrentToken.Kind.GetUnaryOperatorPrecedence();
@@ -80,7 +97,7 @@ namespace Blaster.CodeReview.Syntax
             if (unaryOperatorPrecedence != 0 && unaryOperatorPrecedence >= parentPrecedence)
             {
                 var operatorToken = NextToken();
-                var operand = ParseExpression(unaryOperatorPrecedence);
+                var operand = ParseBinaryExpression(unaryOperatorPrecedence);
                 leftSide = new UnaryExpressionSyntax(operatorToken, operand);
             }
             else
@@ -97,7 +114,7 @@ namespace Blaster.CodeReview.Syntax
                 }
 
                 var operatorToken = NextToken();
-                var rightSide = ParseExpression(precedence);
+                var rightSide = ParseBinaryExpression(precedence);
                 leftSide = new BinaryExpressionSyntax(leftSide, operatorToken, rightSide);
             }
             return leftSide;
@@ -117,12 +134,17 @@ namespace Blaster.CodeReview.Syntax
                         return new ParenthesizedExpressionSyntax(leftSide, expression, rightSide);
                     }
 
-                case SyntaxKind.TrueKeyword:
                 case SyntaxKind.FalseKeyword:
+                case SyntaxKind.TrueKeyword:
                     {
                         var keywordToken = NextToken();
                         var value = keywordToken.Kind == SyntaxKind.TrueKeyword;
                         return new LiteralExpressionSyntax(keywordToken, value);
+                    }
+                case SyntaxKind.IdentifierToken:
+                    {
+                        var identifierToken = NextToken();
+                        return new NameExpressionSyntax(identifierToken);
                     }
                 default:
                     {

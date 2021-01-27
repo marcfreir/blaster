@@ -1,4 +1,5 @@
-﻿using System;
+﻿﻿using System;
+using System.Collections.Generic;
 using Blaster.CodeReview.Binding;
 
 namespace Blaster.CodeReview
@@ -7,10 +8,12 @@ namespace Blaster.CodeReview
     internal sealed class Evaluator
     {
         private readonly BoundExpression _root;
+        private readonly Dictionary<VariableSymbol, object> _variables;
 
-        public Evaluator(BoundExpression root)
+        public Evaluator(BoundExpression root, Dictionary<VariableSymbol, object> variables)
         {
             this._root = root;
+            this._variables = variables;
             //
         }
 
@@ -28,6 +31,16 @@ namespace Blaster.CodeReview
                 return boundLiteralExpression.Value;
             }
 
+            if (node is BoundVariableExpression boundVariableExpression)
+                return _variables[boundVariableExpression.Variable];
+
+            if (node is BoundAssignmentExpression boundAssignmentExpression)
+            {
+                var value = EvaluateExpression(boundAssignmentExpression.Expression);
+                _variables[boundAssignmentExpression.Variable] = value;
+                return value;
+            }
+
             //Evaluate UnaryExpression
             if (node is BoundUnaryExpression boundUnaryExpression)
             {
@@ -40,7 +53,7 @@ namespace Blaster.CodeReview
                     case BoundUnaryOperatorKind.Negation:
                         return -(int) operand;
                     case BoundUnaryOperatorKind.LogicalNegation:
-                        return (bool) operand;
+                        return !(bool) operand;
                     default:
                         throw new Exception($"Unexpected unary operator {boundUnaryExpression.OperatorUnit}");
                 }

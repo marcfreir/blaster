@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Blaster.CodeReview.Syntax
@@ -6,13 +7,13 @@ namespace Blaster.CodeReview.Syntax
     {
         private readonly string _text;
         private int _position;
-        private List<string> _diagnostics = new List<string>();
+        private DiagnosticBag _diagnostics = new DiagnosticBag();
         public Lexer(string text)
         {
             this._text = text;
         }
 
-        public IEnumerable<string> Diagnostics => _diagnostics;
+        public DiagnosticBag Diagnostics => _diagnostics;
 
         private char CurrentChar => Peek(0);
         private char LookAhead => Peek(1);
@@ -44,9 +45,11 @@ namespace Blaster.CodeReview.Syntax
                 return new SyntaxToken(SyntaxKind.EndOfFileToken, _position, "\0", null);
             }
 
+            var start = _position;
+
             if (char.IsDigit(CurrentChar))
             {
-                var start = _position;
+                //var start = _position;
 
                 while (char.IsDigit(CurrentChar))
                 {
@@ -57,9 +60,12 @@ namespace Blaster.CodeReview.Syntax
                 var text = _text.Substring(start, length);
                 if (!int.TryParse(text, out var value))
                 {
-                    _diagnostics.Add($"The number {_text} is NOT a valid Int32.");
-                    var textHint = "[Hint]: (Int32 is an immutable value type that represents signed 32-bit integers with values that range from negative 2,147,483,648 through positive 2,147,483,647.)";
-                    _diagnostics.Add(textHint);
+                    _diagnostics.ReportInvalidNumber(new TextSpan(start, length), _text, typeof(int));
+                    //_diagnostics.Add($"The number {_text} is NOT a valid Int32.");
+                    //var textHint = "[Hint]: (Int32 is an immutable value type that represents signed 32-bit integers with values that range from negative 2,147,483,648 through positive 2,147,483,647.)";
+                    //_diagnostics.Add(textHint);
+                    Console.WriteLine();
+                    Console.WriteLine("[Hint]: (Int32 is an immutable value type that represents signed 32-bit integers with values that range from negative 2,147,483,648 through positive 2,147,483,647.)");
                 }
 
                 return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
@@ -67,8 +73,6 @@ namespace Blaster.CodeReview.Syntax
 
             if (char.IsWhiteSpace(CurrentChar))
             {
-                var start = _position;
-
                 while (char.IsWhiteSpace(CurrentChar))
                 {
                     NextChar();
@@ -84,8 +88,6 @@ namespace Blaster.CodeReview.Syntax
             // False
             if (char.IsLetter(CurrentChar))
             {
-                var start = _position;
-
                 while (char.IsLetter(CurrentChar))
                 {
                     NextChar();
@@ -128,7 +130,8 @@ namespace Blaster.CodeReview.Syntax
                 {
                     if (LookAhead == '&')
                     {
-                        return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, _position += 2, "&&", null);
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.AmpersandAmpersandToken, start, "&&", null);
                     }
                     break;
                 }
@@ -136,7 +139,8 @@ namespace Blaster.CodeReview.Syntax
                 {
                     if (LookAhead == '|')
                     {
-                        return new SyntaxToken(SyntaxKind.PipePipeToken, _position += 2, "||", null);
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.PipePipeToken, start, "||", null);
                     }
                     break;
                 }
@@ -144,25 +148,32 @@ namespace Blaster.CodeReview.Syntax
                 {
                     if (LookAhead == '=')
                     {
-                        return new SyntaxToken(SyntaxKind.EqualsEqualsToken, _position += 2, "==", null);
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.EqualsEqualsToken, start, "==", null);
                     }
-                    break;
+                    else
+                    {
+                        _position += 1;
+                        return new SyntaxToken(SyntaxKind.EqualsToken, start, "=", null);
+                    }
                 }
                 case '!':
                 {
                     if (LookAhead == '=')
                     {
-                        return new SyntaxToken(SyntaxKind.ExclamationEqualsToken, _position += 2, "!=", null);
+                        _position += 2;
+                        return new SyntaxToken(SyntaxKind.ExclamationEqualsToken, start, "!=", null);
                     }
                     else
                     {
-                        return new SyntaxToken(SyntaxKind.ExclamationToken, _position++, "!", null);
+                        _position += 1;
+                        return new SyntaxToken(SyntaxKind.ExclamationToken, start, "!", null);
                     }
                 }
                 
             }
 
-            _diagnostics.Add($"ERROR:: Bad character input: '{CurrentChar}'");
+            _diagnostics.ReportBadCharacter(_position, CurrentChar);
 
             return new SyntaxToken(SyntaxKind.BadToken, _position++, _text.Substring(_position - 1, 1), null);
         }

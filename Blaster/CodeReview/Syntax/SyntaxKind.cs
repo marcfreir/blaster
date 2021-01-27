@@ -11,24 +11,37 @@ namespace Blaster.CodeReview.Syntax
         MinusToken,
         MultiplyToken,
         DivideToken,
-        OpenParenthesisToken,
-        CloseParenthesisToken,
+
+        //BangToken,
         ExclamationToken,
+        
+        EqualsToken,
         AmpersandAmpersandToken,
         PipePipeToken,
         EqualsEqualsToken,
+
+        //BangEqualsToken,
         ExclamationEqualsToken,
+
+        OpenParenthesisToken,
+        CloseParenthesisToken,
         IdentifierToken,
+        
+
+        
 
         // Keywords
-        TrueKeyword,
         FalseKeyword,
+        TrueKeyword,
+
 
         // Expressions
         LiteralExpression,
+        NameExpression,
         UnaryExpression,
         BinaryExpression,
         ParenthesizedExpression,
+        AssignmentExpression,
         
     }
 }

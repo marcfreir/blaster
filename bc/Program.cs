@@ -24,7 +24,8 @@ namespace Blaster
 
             Console.WriteLine($"{_blasterLineStart}\n{_blasterWelcome}\n{_blasterVersion}\n{_blasterAuthor}\n{_blasterDate}\n{_blasterLineEnd}\n");
 
-            
+            var variables = new Dictionary<VariableSymbol, object>();
+
             while (true)
             {
                 //For the terminal inicialization
@@ -50,7 +51,9 @@ namespace Blaster
 
                     case "$udo showTree":
                         _showTree = true;
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
                         Console.WriteLine(_showTree ? "Showing parse trees ENABLED." : "Showing parse trees DISABLED.");
+                        Console.ResetColor();
                         continue;
                     case "$udo hideTree":
                         //if (_showTree)
@@ -61,11 +64,13 @@ namespace Blaster
                     case "$udo help":
                     case "$udo HELP":
                         {
+                            Console.ForegroundColor = ConsoleColor.Green;
                             var _help_command = "[You typed >> $help]";
                             var _type_line = "Just type the command...\n";
                             var _exit_message = "$udo exit -> to exit the terminal. ";
                             var _help_message = "$udo help -> to help hints. ";
                             Console.WriteLine($"{_help_command}\n\n{_type_line}\n{_exit_message}\n{_help_message}");
+                            Console.ResetColor();
                             continue;
                         }
 
@@ -86,19 +91,19 @@ namespace Blaster
                 //var parser = new Parser(inputLine);
                 var syntaxTree = SyntaxTree.Parse(inputLine);
                 var compilation = new Compilation(syntaxTree);
-                var result = compilation.Evaluate();
+                var result = compilation.Evaluate(variables);
                 //var boundExpression = compilation.BindExpression(syntaxTree.Root);
 
-                var diagnostics = result.Diagnostics;
+                //var diagnostics = result.Diagnostics;
 
                 if (_showTree)
                 {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;                    
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
                     PrettyPrint(syntaxTree.Root);
                     Console.ResetColor();
                 }
 
-                if (!diagnostics.Any())
+                if (!result.Diagnostics.Any())
                 {
                     //var evaluator = new Evaluator(boundExpression);
                     //var evaluationResult = evaluator.Evaluate();
@@ -109,11 +114,24 @@ namespace Blaster
                 {
                     Console.ForegroundColor = ConsoleColor.DarkRed;
 
-                    foreach (var diagnostic in diagnostics)
+                    foreach (var diagnostic in result.Diagnostics)
                     {
                         Console.WriteLine(diagnostic);
+                        Console.ResetColor();
+
+                        var prefix = inputLine.Substring(0, diagnostic.Span.Start);
+                        var error = inputLine.Substring(diagnostic.Span.Start, diagnostic.Span.Length);
+                        var suffix = inputLine.Substring(diagnostic.Span.End);
+                        Console.Write("    ");
+                        Console.Write(prefix);
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.Write(error);
+                        Console.ResetColor();
+                        Console.Write(suffix);
+                        Console.WriteLine();
                     }
                     Console.ResetColor();
+                    Console.WriteLine();
                 }
             }
         }
