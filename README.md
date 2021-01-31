@@ -18,5 +18,5 @@ __Terminal preview 02:__
     Status: On-going
     Version: 1.0
     Created by: Marc Freir
-    Licence: MIT
+    Licence: BSD 3-Clause
     Any question? Please email-me: marcfreir@outlook.com
